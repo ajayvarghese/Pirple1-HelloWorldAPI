@@ -1,3 +1,9 @@
+/* 
+  HERE LIES THE SERVER CODE..
+  TO START SERVER: node index 
+*/
+
+
 const http = require('http');
 const https = require('https');
 const url = require('url');
@@ -30,7 +36,7 @@ httpsServer.listen(config.httpsPort, () => {
   console.log(`Server is listening on HTTPS Port ${config.httpsPort} in ${config.envName} now...`);
 });
 
-
+// REQUEST HANDLERS
 const handlers = {};
 
 handlers.welcome = (data, callback) => {
@@ -68,7 +74,10 @@ const unifiedServer = (req, res) => {
   });
   req.on('end', () => {
     buffer += decoder.end();
+    
+    // ASSIGNING HANDLER FOR RECIEVED REQUEST
     const chosenHandler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : handlers.notFound;
+
     const data = {
       trimmedPath,
       queryStringObj,
@@ -77,9 +86,12 @@ const unifiedServer = (req, res) => {
       buffer
     };
     chosenHandler(data, (statusCode, payload) => {
+      // GETTING STATUSCODE AND PAYLOAD
       statusCode = typeof(statusCode) === 'number' ? statusCode : 200;
       payload = typeof(payload) === 'object' ? payload : {};
       const payloadString = JSON.stringify(payload);
+
+      // RESPONSE
       res.setHeader('Content-type', 'application/json');
       res.writeHead(statusCode);
       res.end(payloadString);
